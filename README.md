@@ -1,2 +1,2 @@
-# fable-tour-of-heroes
+# Fable: Tour of heroes
 Content for webinar with JetBrains 
