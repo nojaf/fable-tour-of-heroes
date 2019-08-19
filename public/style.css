@@ -1,0 +1,157 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+/* Global */
+
+a {
+    color: cornflowerblue;
+    cursor: pointer;
+}
+
+html, body, #app {
+    height: 100%;
+    overflow-y:hidden;
+}
+
+#app {
+    padding: 1rem;
+    background-color: whitesmoke;
+}
+
+h2 {
+    margin-bottom: 1.5rem;
+}
+
+.w50 {
+    width: 50%;
+}
+
+input {
+    border-radius: 3px;
+    margin: 0 0.5rem;
+    border: 1px solid darkslategrey;
+    min-height: 24px;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: deepskyblue;
+    border: 1px solid darkslateblue;
+    padding: 4px 6px;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    box-sizing: border-box;
+    min-height: 24px;
+}
+
+button:hover {
+    background-color: midnightblue;
+}
+
+button:active {
+    background-color: darkblue;
+}
+
+@keyframes spin-animation {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation-name: spin-animation;
+    animation-duration: 800ms;
+    animation-iteration-count: infinite;
+    margin-right: 6px;
+    display: inline-block;
+}
+
+/* Navigation */
+
+nav {
+    display: flex;
+}
+
+nav a {
+    margin: 2rem;
+}
+
+/* Dashboard */
+#dashboard .grid {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+#dashboard .grid  a {
+    flex: 1;
+    min-height: 50px;
+    text-align: center;
+    background-color: darkorange;
+    color: whitesmoke;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0.5rem;
+}
+
+#heroes form {
+    margin: 1rem 0;
+}
+
+#heroes .heroes {
+    list-style-type: none;
+}
+
+#heroes .heroes li {
+    margin: 1rem;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+#heroes .heroes li a em {
+    margin: 1rem;
+    min-width: 150px;
+    display: inline-block;
+}
+
+#heroes .heroes li .badge {
+    font-size: x-small;
+    color: ghostwhite;
+    background-color: black;
+    padding: 5px;
+    border-radius: 10px;
+    margin-right: 5px;
+    width: 16px;
+    display: inline-block;
+    text-align: center;
+}
+
+#heroes .heroes li button {
+    background-color: firebrick;
+    padding: 5px;
+    line-height: 5px;
+    font-size: 10px;
+    min-height: 20px;
+    min-width: 20px;
+    border-radius: 30px;
+    text-align: center;
+}
+
+#heroes .heroes li button:hover {
+    background-color: indianred;
+}
+
+#heroes .heroes li button:active {
+    background-color: darkred;
+}

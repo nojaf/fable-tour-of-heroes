@@ -1,0 +1,24 @@
+{
+  "name": "fable-tour-of-heroes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/nojaf/fable-tour-of-heroes.git",
+  "author": "nojaf <florian.verdonck@outlook.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack -p"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "fable-compiler": "^2.3.19",
+    "fable-loader": "^2.1.8",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0"
+  },
+  "dependencies": {
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
+  }
+}
