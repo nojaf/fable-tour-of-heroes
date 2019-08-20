@@ -18,11 +18,14 @@ type Msg =
     | RemoveHero of int
     | AddHero of Hero
     | UpdateHero of int * Hero
+    | HeroesLoaded of Map<int,Hero>
+    | HeroesFailedToLoad of string
 
 type Model =
     { Heroes: Map<int, Hero>
       CurrentRoute: Route option
-      SelectedHero: int option }
+      SelectedHero: int option
+      IsLoadingHeroes: bool }
 
 [<NoComparison>]
 type AppContext =
@@ -60,15 +63,17 @@ type HeroFormProps =
       ButtonText: string }
 let HeroForm =
     FunctionComponent.Of (fun props ->
+        // We use Reacts use-state here in order to prevent to keep change of the value of the input in the Model
+        // Because it would bloat the history of Msg's and we only really care in respect to the Model when it is submitted.
         let hero = Hooks.useState(props.InitialHero)
         let onSubmit (ev:Event) =
             ev.preventDefault()
             props.OnSubmit hero.current
 
         form [OnSubmit onSubmit] [
-            label [] [str props.LabelText] //
+            label [] [str props.LabelText]
             input [Value hero.current; OnChange (fun ev -> ev.Value |> hero.update)]
-            button [] [str props.ButtonText] // "add"
+            button [] [str props.ButtonText]
         ]
     , "HeroForm")
 

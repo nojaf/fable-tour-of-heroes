@@ -1,5 +1,3 @@
-open Fable.React
-
 #load "Shared.fsx"
 
 open Fable.Core.JsInterop
@@ -10,16 +8,6 @@ open Elmish.React
 open Elmish.Navigation
 open Elmish.Debug
 open Shared
-let superFriends =
-    [ 1, "The Man of Steel"
-      2, "The Dark Knight"
-      3, "The Amazing Amazon"
-      4, "The Emerald Guardian"
-      5, "The Scarlet Speedster"
-      6, "The King of the Seven Seas"
-      7, "The Martian Manhunter" ]
-    |> Map.ofList
-
 module Routing =
     open Elmish.UrlParser
 
@@ -49,16 +37,52 @@ let urlUpdate (route: Route option) (model: Model) =
             { model with SelectedHero = Some id
                          CurrentRoute = route }, Cmd.none
         else
-            { model with CurrentRoute = None }, Cmd.none
+            { model with CurrentRoute = route }, Cmd.none
     | _ ->
         { model with CurrentRoute = route }, Cmd.none
+
+open Thoth.Json
+
+let getHeroes (dispatch:Dispatch<Msg>) =
+    let decoder =
+        Decode.object (fun get ->
+            get.Required.Field "id" Decode.int, get.Required.Field "name" Decode.string
+        )
+        |> Decode.array
+
+    Fetch.fetch "/heroes.json" []
+    |> Promise.bind (fun response -> response.text())
+    |> Promise.map (fun json ->
+        // We don't trust the incoming JSON, so we use a decode function to verify it is what we think it is.
+        Decode.fromString decoder json
+        |> fun result ->
+            match result with
+            | Ok heroes ->
+                heroes
+                |> Map.ofArray
+                |> Msg.HeroesLoaded
+                |> dispatch
+            | Error err ->
+                Msg.HeroesFailedToLoad err
+                |> dispatch
+    )
+    |> Promise.catchEnd (fun ex ->
+        Msg.HeroesFailedToLoad (ex.ToString())
+        |> dispatch
+    )
+
+
 let init _ =
     let model =
-        { Heroes = superFriends
+        { Heroes = Map.empty
           CurrentRoute = None
-          SelectedHero = None }
+          SelectedHero = None
+          IsLoadingHeroes = true }
     let route = Routing.parsePath Browser.Dom.document.location
-    urlUpdate route model
+    let cmd = Cmd.ofSub getHeroes
+    let model', cmd' = urlUpdate route model
+    // We combine the possible Commands from the urlUpdate with our own create Cmd of getHeroes
+    model', Cmd.batch [cmd;cmd']
 
 let update msg model =
     match msg with
@@ -78,8 +102,24 @@ let update msg model =
     | UpdateHero (id,hero) ->
         let heroes =
             Map.add id hero model.Heroes
-        { model with Heroes = heroes }, Cmd.ofMsg (Navigate Route.Heroes)
+        { model with Heroes = heroes
+                     IsLoadingHeroes = false }, Cmd.ofMsg (Navigate Route.Heroes)
+    | HeroesLoaded heroes ->
+        // if needed force a reload of the Detail page, in urlUpdate the correct heroes will be set if found.
+        let cmd =
+            match model.CurrentRoute with
+            | Some(Route.Detail id) ->Cmd.ofMsg (Navigate (Route.Detail id))
+            | _ -> Cmd.none
 
+        { model with Heroes = heroes
+                     IsLoadingHeroes = false }, cmd
+    | HeroesFailedToLoad err ->
+        printfn "Error while loading the heroes: %s" err
+        // In a typical application you would add something to the Model and display to user that something went wrong.
+        // For now we are going to just log the error
+        model, Cmd.none
+
+// See https://reactjs.org/docs/code-splitting.html#suspense
 let suspense fallback children =
     let props = createObj [ "fallback" ==> fallback ]
     ofImport "Suspense" "react" props children
@@ -98,6 +138,8 @@ let layout page =
         suspense fallback [page]
     ]
 
+
+// See https://reactjs.org/docs/code-splitting.html#reactlazy
 let DashboardPage props : ReactElement =
     let dashboard = ReactBindings.React.``lazy`` (fun () -> importDynamic "./DashboardPage.fsx")
     ReactBindings.React.createElement(dashboard, props, [])
@@ -114,15 +156,19 @@ let App =
     FunctionComponent.Of (fun () ->
         let model = useModel()
 
-        match model.CurrentRoute with
-        | Some(Route.Root) -> str "redirecting..."
-        | Some(Route.Dashboard) -> DashboardPage()
-        | Some(Route.Heroes) -> HeroesPage()
-        | Some(Route.Detail _) -> DetailPage()
-        | None -> h1 [] [str "404 - Hero not found"]
+        if model.IsLoadingHeroes then
+            fallback
+        else
+            match model.CurrentRoute with
+            | Some(Route.Root) -> str "redirecting..."
+            | Some(Route.Dashboard) -> DashboardPage()
+            | Some(Route.Heroes) -> HeroesPage()
+            | Some(Route.Detail _) -> DetailPage()
+            | None -> h1 [] [str "404 - Hero not found"]
         |> layout
     , "App")
 
+// See https://reactjs.org/docs/context.html
 let ElmishCapture =
     FunctionComponent.Of (
         fun (props:AppContext) ->
@@ -133,7 +179,7 @@ let view model dispatch =
     ElmishCapture { Model = model; Dispatch = dispatch }
 
 Program.mkProgram init update view
-#if DEBUG
+#if DEBUG // with the hash directive, the debug functionality does not end up in our production bundle
 |> Program.withDebugger
 #endif
 |> Program.toNavigable Routing.parsePath urlUpdate

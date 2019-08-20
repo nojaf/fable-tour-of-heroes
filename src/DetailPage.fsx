@@ -28,4 +28,5 @@ let private DetailPage =
         )
         ,"DetailPage")
 
+// export default is required for React to import lazy components
 exportDefault DetailPage

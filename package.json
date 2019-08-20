@@ -17,7 +17,9 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack -p",
-    "postinstall": "paket restore && paket generate-load-scripts -t fsx"
+    "postinstall": "paket restore && paket generate-load-scripts -t fsx",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d public"
   },
   "dependencies": {
     "react": "^16.9.0",

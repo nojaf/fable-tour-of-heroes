@@ -38,4 +38,5 @@ let private HeroesPage =
         ,"HeroesPage"
     )
 
+// export default is required for React to import lazy components
 exportDefault HeroesPage

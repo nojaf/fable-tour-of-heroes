@@ -6,6 +6,8 @@ open Fable.React
 open Fable.React.Props
 open Shared
 
+// These are bindings for react-select, https://react-select.com
+// To illustrate that we can leverage the existing React ecosystem
 [<RequireQualifiedAccess>]
 module private ReactSelect =
     let selectImport : ReactElement = importDefault "react-select"
@@ -58,4 +60,5 @@ let private DashboardPage =
         )
         ,"DashboardPage")
 
+// export default is required for React to import lazy components
 exportDefault DashboardPage
