@@ -1,10 +1,21 @@
 # Fable: Tour of heroes
-Content for webinar with JetBrains 
 
-## Bundle size
+Content for webinar with JetBrains
 
-Initial: 380
+## Prerequisites
 
-Without devtools: 268
+To run this sample you need:
 
-Splitted: 190 initial
+- [Fable prerequisites](https://fable.io/docs/2-steps/setup.html#Prerequisites)
+- [Paket](https://fsprojects.github.io/Paket/), `dotnet tool install -g Paket`
+- [Yarn](https://yarnpkg.com/en/)
+
+## Run
+
+Install both npm packages and NuGet packages with:
+
+> yarn
+
+Start webpack dev server:
+
+> yarn start
